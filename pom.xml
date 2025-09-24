@@ -64,7 +64,35 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
-		</plugins>
+            <plugin>
+                <groupId>com.google.cloud.tools</groupId>
+                <artifactId>jib-maven-plugin</artifactId>
+                <version>3.4.6</version>
+                <configuration>
+                    <from>
+                        <image>openjdk:17-jdk</image>
+                    </from>
+                    <to>
+                        <image>lms/namingserver:${project.version}</image>
+                    </to>
+                    <container>
+                        <ports>
+                            <port>9001</port>
+                        </ports>
+                    </container>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>docker-build</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>dockerBuild</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+        </plugins>
 	</build>
 
 </project>
