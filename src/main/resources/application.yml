@@ -1,6 +1,6 @@
 spring:
   application:
-  name: naming-server
+  name: lms-naming-server
 
 server:
   port: 9001
