@@ -58,41 +58,114 @@
 		</dependencies>
 	</dependencyManagement>
 
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-			</plugin>
-            <plugin>
-                <groupId>com.google.cloud.tools</groupId>
-                <artifactId>jib-maven-plugin</artifactId>
-                <version>3.4.6</version>
-                <configuration>
-                    <from>
-                        <image>openjdk:17-jdk</image>
-                    </from>
-                    <to>
-                        <image>lms/namingserver:${project.version}</image>
-                    </to>
-                    <container>
-                        <ports>
-                            <port>9001</port>
-                        </ports>
-                    </container>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>docker-build</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>dockerBuild</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
+    <profiles>
+        <!-- Build to local Docker (no push) -->
+        <profile>
+            <id>local</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.google.cloud.tools</groupId>
+                        <artifactId>jib-maven-plugin</artifactId>
+                        <version>3.4.6</version>
+                        <configuration>
+                            <from>
+                                <image>eclipse-temurin:17-jre-alpine</image>
+                            </from>
+                            <to>
+                                <image>lms/naming-server:${project.version}</image>
+                                <tags>
+                                    <tag>${project.version}</tag>
+                                    <tag>latest</tag>
+                                </tags>
+                            </to>
+                            <container>
+                                <jvmFlags>
+                                    <!-- start with 256MB heap-->
+                                    <jvmFlag>-Xms256m</jvmFlag>
+                                    <!-- Never use more than 512MB heap-->
+                                    <jvmFlag>-Xmx512m</jvmFlag>
+                                </jvmFlags>
+                                <ports>
+                                    <port>9001</port>
+                                </ports>
+                            </container>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>docker-build</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>dockerBuild</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <!--       Push to remote registry -->
+        <profile>
+            <id>registry</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.google.cloud.tools</groupId>
+                        <artifactId>jib-maven-plugin</artifactId>
+                        <version>3.4.6</version>
+                        <configuration>
+                            <from>
+                                <image>eclipse-temurin:17-jre-alpine</image>
+                            </from>
+                            <to>
+                                <image>ghcr.io/lead-management-app/naming-server:${project.version}</image>
+                                <auth>
+                                    <username>${env.GITHUB_USERNAME}</username>
+                                    <password>${env.GITHUB_TOKEN}</password>
+                                </auth>
+                                <tags>
+                                    <tag>${project.version}</tag>
+                                    <tag>latest</tag>
+                                </tags>
+                            </to>
+                            <container>
+                                <jvmFlags>
+                                    <!-- start with 256MB heap-->
+                                    <jvmFlag>-Xms256m</jvmFlag>
+                                    <!-- Never user more than 512MB heap-->
+                                    <jvmFlag>-Xmx512m</jvmFlag>
+                                </jvmFlags>
+                                <ports>
+                                    <port>9001</port>
+                                </ports>
+                            </container>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>registry-build</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>build</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
         </plugins>
-	</build>
+    </build>
+
 
 </project>
