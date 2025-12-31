@@ -91,7 +91,6 @@
                                 <image>lms/naming-server:${project.version}</image>
                                 <tags>
                                     <tag>${project.version}</tag>
-                                    <tag>latest</tag>
                                 </tags>
                             </to>
                             <container>
